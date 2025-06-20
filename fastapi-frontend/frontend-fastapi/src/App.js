@@ -93,7 +93,7 @@ function App() {
           }}
         >
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6">Employee Manager,{user}</Typography>
+            <Typography variant="h6">Employee,{user}</Typography>
             <Button color="inherit" onClick={handleLogout} sx={{backgroundColor:"red"}}>Logout</Button>
           </Toolbar>
         </AppBar>
