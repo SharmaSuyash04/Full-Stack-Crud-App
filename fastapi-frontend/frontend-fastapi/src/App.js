@@ -1,3 +1,7 @@
+//1.Database created
+//2. FastAPI backend created with CRUD operations for employees
+//3. React frontend created with Material-UI for UI components
+
 //frontend sends http requests to the backend (FastAPI) to manage employees.
 import React, { useEffect, useState } from 'react';
 import {
