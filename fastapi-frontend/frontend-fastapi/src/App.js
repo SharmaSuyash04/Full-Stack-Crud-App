@@ -1,3 +1,4 @@
+//frontend sends http requests to the backend (FastAPI) to manage employees.
 import React, { useEffect, useState } from 'react';
 import {
   AppBar,
