@@ -1,145 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Container,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Box,
-} from '@mui/material';
-
-import EmployeeForm from './components/EmployeeForm';
-import EmployeeList from './components/EmployeeList';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
+import Dashboard from './components/Dashboard';
+import EmployeeList from './components/EmployeeList';
 import { getEmployees } from './services/api';
+import { useNavigate } from 'react-router-dom';
 
-const drawerWidth = 240;
 
 function App() {
-  const [user, setUser] = useState(null); // Holds logged-in username
+  const [user, setUser] = useState(localStorage.getItem('user'));
   const [employees, setEmployees] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [activePage, setActivePage] = useState('');
+  const navigate = useNavigate();
 
-  //  Check if user is already logged in (from localStorage)
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(storedUser);
-    }
-  }, []);
 
-  const getAllEmployees = async () => {
+  const fetchEmployees = async () => {
     const data = await getEmployees();
     setEmployees(data);
   };
 
   useEffect(() => {
     if (user) {
-      getAllEmployees();
+      fetchEmployees();
     }
   }, [user]);
 
-  const handleOpenForm = () => setOpenDialog(true);
-  const handleCloseForm = () => setOpenDialog(false);
-  const handleEmployeeAdded = () => {
-    getAllEmployees();
-    handleCloseForm();
-  };
-
-  //  When login is successful — save to state and localStorage
   const handleLoginSuccess = (username) => {
     setUser(username);
-    localStorage.setItem('user', username); // Save to localStorage
+    localStorage.setItem('user', username);
   };
 
-  //  When logging out — clear state and localStorage
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    navigate('/login');  
   };
 
-  //  If not logged in, show Login page
-  if (!user) {
-    return <LoginForm onLoginSuccess={handleLoginSuccess} />;
-  }
-
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: 'orange',
-          },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <ListItem button onClick={() => setActivePage('employeeList')}>
-              <ListItemText primary="Employee List" />
-            </ListItem>
-          </List>
-        </Box>
-      </Drawer>
+    
+      <Routes>
+        {!user && <Route path="*" element={<Navigate to="/login" />} />}
+        {user && <Route path="*" element={<Navigate to="/dashboard" />} />}
 
-      {/* Main Content */}
-      <Box component="main" sx={{ flexGrow: 1 }}>
-        <AppBar
-          position="fixed"
-          sx={{
-            zIndex: (theme) => theme.zIndex.drawer + 1,
-            backgroundColor: '#2e7d32',
-          }}
-        >
-          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6">Employee, {user}</Typography>
-            <Button color="inherit" onClick={handleLogout} sx={{ backgroundColor: 'red' }}>
-              Logout
-            </Button>
-          </Toolbar>
-        </AppBar>
+        <Route path="/login" element={<LoginForm onLoginSuccess={handleLoginSuccess} />} />
 
-        <Toolbar />
-
-        <Container sx={{ mt: 4 }}>
-          <Button variant="contained" onClick={handleOpenForm} sx={{ mb: 3 }}>
-            Add Employee
-          </Button>
-
-          <Dialog open={openDialog} onClose={handleCloseForm} fullWidth maxWidth="sm">
-            <DialogTitle>Add New Employee</DialogTitle>
-            <DialogContent>
-              <EmployeeForm onEmployeeAdded={handleEmployeeAdded} />
-            </DialogContent>
-          </Dialog>
-
-          {activePage === 'employeeList' && (
-            <EmployeeList employees={employees} refresh={getAllEmployees} />
-          )}
-
-          {activePage !== 'employeeList' && (
-            <Typography variant="body1" color="text.secondary">
-              Select a section from the sidebar.
-            </Typography>
-          )}
-        </Container>
-      </Box>
-    </Box>
+        <Route path="/dashboard" element={
+          <Dashboard
+            user={user}
+            onLogout={handleLogout}
+            employees={employees}
+            refreshEmployees={fetchEmployees}
+          />
+        }>
+          {/* 🟢 Nested route */}
+          <Route path="employees" element={
+            <EmployeeList employees={employees} refresh={fetchEmployees} />
+          } />
+        </Route>
+      </Routes>
+    
   );
 }
 
 export default App;
+
