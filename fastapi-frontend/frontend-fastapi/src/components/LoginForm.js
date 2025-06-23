@@ -7,11 +7,13 @@ import {
   Typography,
   Link,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ onLoginSuccess }) => {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [isSignup, setIsSignup] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,7 +33,9 @@ const LoginForm = ({ onLoginSuccess }) => {
       } else {
         // Login API
         const res = await axios.post('http://localhost:8000/login', form);
+        localStorage.setItem('username', res.data.username); //  Save to localStorage
         onLoginSuccess(res.data.username);
+        navigate('/app'); // redirect to app after successful login
       }
     } catch (err) {
       setError(err?.response?.data?.detail || 'Something went wrong');

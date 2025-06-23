@@ -1,8 +1,3 @@
-//1.Database created
-//2. FastAPI backend created with CRUD operations for employees
-//3. React frontend created with Material-UI for UI components
-
-//frontend sends http requests to the backend (FastAPI) to manage employees.
 import React, { useEffect, useState } from 'react';
 import {
   AppBar,
@@ -28,10 +23,18 @@ import { getEmployees } from './services/api';
 const drawerWidth = 240;
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // Holds logged-in username
   const [employees, setEmployees] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [activePage, setActivePage] = useState('');
+
+  //  Check if user is already logged in (from localStorage)
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
 
   const getAllEmployees = async () => {
     const data = await getEmployees();
@@ -51,14 +54,19 @@ function App() {
     handleCloseForm();
   };
 
+  //  When login is successful — save to state and localStorage
   const handleLoginSuccess = (username) => {
     setUser(username);
+    localStorage.setItem('user', username); // Save to localStorage
   };
 
+  //  When logging out — clear state and localStorage
   const handleLogout = () => {
     setUser(null);
+    localStorage.removeItem('user');
   };
 
+  //  If not logged in, show Login page
   if (!user) {
     return <LoginForm onLoginSuccess={handleLoginSuccess} />;
   }
@@ -74,7 +82,7 @@ function App() {
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: 'border-box',
-            backgroundColor: 'orange'
+            backgroundColor: 'orange',
           },
         }}
       >
@@ -98,8 +106,10 @@ function App() {
           }}
         >
           <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography variant="h6">Employee,{user}</Typography>
-            <Button color="inherit" onClick={handleLogout} sx={{backgroundColor:"red"}}>Logout</Button>
+            <Typography variant="h6">Employee, {user}</Typography>
+            <Button color="inherit" onClick={handleLogout} sx={{ backgroundColor: 'red' }}>
+              Logout
+            </Button>
           </Toolbar>
         </AppBar>
 
