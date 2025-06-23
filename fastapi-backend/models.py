@@ -10,7 +10,7 @@ class Employee(Base):                                   #class Employee(Base): d
     email = Column(String(100))
     salary = Column(DECIMAL(10, 2))
 
-# ✅ NEW: User model for login authentication
+#  NEW: User model for login authentication
 class User(Base): #class User(Base): defines a new ORM model called User that represents a table named users.
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)

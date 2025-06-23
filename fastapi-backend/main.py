@@ -1,11 +1,12 @@
+#python -m uvicorn main:app --reload to run
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models, schemas, crud
 from fastapi.middleware.cors import CORSMiddleware
-from passlib.context import CryptContext  # ✅ Added
+from passlib.context import CryptContext  #  Added
 
-# ✅ Password hashing config
+#  Password hashing config
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Create all tables
@@ -13,7 +14,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# ✅ CORS for frontend access
+#  CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all for development
@@ -22,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Dependency to get DB session
+#  Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -30,7 +31,7 @@ def get_db():
     finally:
         db.close()
 
-# ✅ EMPLOYEE ROUTES
+#  EMPLOYEE ROUTES
 @app.get("/employees", response_model=list[schemas.Employee])
 def read_employees(db: Session = Depends(get_db)):
     return crud.get_employees(db)
@@ -53,7 +54,7 @@ def delete_employee(employee_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Employee not found")
     return deleted
 
-# ✅ LOGIN ROUTE — fixed password check
+#  LOGIN ROUTE — fixed password check
 @app.post("/login")
 def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     existing_user = db.query(models.User).filter(models.User.username == user.username).first()
@@ -61,7 +62,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid username or password")
     return {"message": "Login successful", "username": user.username}
 
-# ✅ SIGNUP — hashes password before saving
+#  SIGNUP — hashes password before saving
 @app.post("/signup")
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = pwd_context.hash(user.password)
