@@ -31,6 +31,6 @@ class UserLogin(BaseModel):
     password: str
 
 
-class UserCreate(BaseModel):#bla bla
+class UserCreate(BaseModel):
     username: str
     password: str
