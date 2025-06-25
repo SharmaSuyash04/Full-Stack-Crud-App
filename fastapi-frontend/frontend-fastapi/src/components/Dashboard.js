@@ -7,6 +7,7 @@ import {
 import EmployeeForm from './EmployeeForm';
 import EmployeeList from './EmployeeList';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -76,7 +77,7 @@ const Dashboard = ({ user, onLogout, employees, refreshEmployees }) => {
           </Dialog>
 
           {/* 🔥 Render child route (like /dashboard/employees) here */}
-          <Outlet />
+           <Outlet />
         </Container>
       </Box>
     </Box>
